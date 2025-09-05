@@ -22,5 +22,11 @@ def testLab1_part2():
   sub_Z809 = SubGroup("ZpAdditive", 0, 22, 23, 5)
   print(sub_Z809.testDiffieHellman())
   print(sub_Z809.DiffieHellman(5, 6, 2, 7, 12))
+
+def testLab1_part4():
+  F256 = Group("F2^n", )
+
+
+
 testLab1_part1()
 testLab1_part2()

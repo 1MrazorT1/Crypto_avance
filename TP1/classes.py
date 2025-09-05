@@ -1,12 +1,16 @@
 from math import floor, log2, ceil, sqrt
 from random import randint
+from lab1_utils import deg
 
 class Group(object):
-  def __init__(self, l, e, N, p):
+  def __init__(self, l, e, N, p, poly = None):
     self.l = l
     self.e = e
     self.N = N
     self.p = p
+    self.poly = poly
+    if self.poly != null
+      self.N = deg(self.poly)
     if self.checkParameters() != True:
       raise Exception("Problem with parameters")
   
@@ -18,8 +22,20 @@ class Group(object):
   def law(self, g1, g2):
     if self.l == "ZpAdditive":
       return (g1 + g2) % self.p
-    else:
+    elif self.l == "ZpMultiplicative":
       return (g1 * g2) % self.p
+    elif self.l == "F2^n":
+      p = 0
+      while g2 != 0:
+        if (g2 & 1) > 0:
+          p = p ^ g1
+        g1 = g1 << 1
+        if g1 & (1 << self.N) > 0:
+          for i in range(N+1):
+            if i % 2 == 1:
+              g1 = g1 ^ (1 << )
+        g2 = g2 >> 1
+      return p
 
   def exp(self, g, k):
     if k == 0:
