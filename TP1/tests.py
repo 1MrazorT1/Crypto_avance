@@ -17,5 +17,10 @@ def testLab1_part1():
   i = 500
   h = sub_Z809_mult.exp(sub_Z809_mult.g, i)
   print("In the subgroup of (Z809)* : i = ", sub_Z809_mult.DLbyTrialMultiplication(h))
-  
+
+def testLab1_part2():
+  sub_Z809 = SubGroup("ZpAdditive", 0, 22, 23, 5)
+  print(sub_Z809.testDiffieHellman())
+  print(sub_Z809.DiffieHellman(5, 6, 2, 7, 12))
 testLab1_part1()
+testLab1_part2()

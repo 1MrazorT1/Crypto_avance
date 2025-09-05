@@ -1,4 +1,6 @@
 from math import floor, log2, ceil, sqrt
+from random import randint
+
 class Group(object):
   def __init__(self, l, e, N, p):
     self.l = l
@@ -50,7 +52,16 @@ class SubGroup(Group):
         return i
       else:
         tmp = self.law(tmp, self.g)
-
+  
+  def testDiffieHellman(self):
+    a = randint(0, self.N)
+    b = randint(0, self.N)
+    A = self.exp(self.g, a)
+    B = self.exp(self.g, b)
+    return self.exp(A, b) == self.exp(B, a)
+  
+  def DiffieHellman(self, a, b, A, B, K):
+    return A == self.exp(self.g, a) and B == self.exp(self.g, b) and K == self.exp(A, b) and K == self.exp(B, a)
 
 
 
