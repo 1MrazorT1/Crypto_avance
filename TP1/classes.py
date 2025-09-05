@@ -1,4 +1,4 @@
-import math
+from math import floor, log2, ceil, sqrt
 class Group(object):
   def __init__(self, l, e, N, p):
     self.l = l
@@ -27,7 +27,7 @@ class Group(object):
     else:
       h0 = self.e
       h1 = g
-      t = math.floor(math.log2(k))
+      t = floor(log2(k))
       for i in range(t, -1, -1):
         ki = (k >> i) & 1
         if ki == 0:
@@ -37,3 +37,34 @@ class Group(object):
           h0 = self.law(h0, h1)
           h1 = self.law(h1, h1)
       return h0
+
+class SubGroup(Group):
+  def __init__(self, l, e, N, p, g):
+    Group.__init__(self, l, e, N, p)
+    self.g = g
+  
+  def DLbyTrialMultiplication(self, h):
+    tmp = self.e
+    for i in range(self.N):
+      if tmp == h:
+        return i
+      else:
+        tmp = self.law(tmp, self.g)
+
+
+
+
+
+
+
+  
+  #def DLbyTrialMultiplication(self, h):
+  #  w = ceil(sqrt(self.N))
+  #  T = []
+  #  for i in range(0, w + 1):
+  #    T.append(self.exp(self.g, i*w))
+  #  print(T)
+  #  for j in range(0, w + 1):
+  #    x = self.law(h, self.exp(self.exp(self.g, -1), j))
+  #    if x == T[i]:
+  #      return (w * i + j) % N
