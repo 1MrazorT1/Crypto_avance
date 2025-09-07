@@ -22,8 +22,8 @@ def testLab1_part1():
 
 def testLab1_part2():
   sub_Z809 = SubGroup("ZpAdditive", 0, 22, 23, None, 5)
-  print("test de testDiffieHellman : ", sub_Z809.testDiffieHellman())
-  print("test de DiffieHellman sur sous groupe de Z809 : ", sub_Z809.DiffieHellman(5, 6, 2, 7, 12))
+  print("Test de testDiffieHellman : ", sub_Z809.testDiffieHellman())
+  print("Test de DiffieHellman sur sous groupe de Z809 : ", sub_Z809.DiffieHellman(5, 6, 2, 7, 12))
 
   #Testing the law in F2^n
   F256 = Group("F2^n", 1, 8, 2, 283) #283 = 2^8 + 2^4 + 2^3 + 2^1 + 2^0
@@ -33,8 +33,6 @@ def testLab1_part2():
   i = randint(1, 255)
   F256x = SubGroup("F2^n", 1, 8, 2, 283, 3)
   h = F256x.exp(F256x.g, i)
-  print(h)
-  print(F256x.testDiffieHellman())
   print("In F2^256, DLbyTrialMultiplication returns the googd result : ", i == F256x.DLbyTrialMultiplication(h))
 
 
