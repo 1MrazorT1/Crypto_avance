@@ -9,7 +9,7 @@ class Group(object):
     self.N = N
     self.p = p
     self.poly = poly
-    if self.poly != null
+    if self.poly != None:
       self.N = deg(self.poly)
     if self.checkParameters() != True:
       raise Exception("Problem with parameters")
@@ -17,7 +17,7 @@ class Group(object):
   def checkParameters(self):
     if self.l == "":
       raise Exception("l is unknown.")
-    return (self.l == "ZpAdditive" and self.e == 0) or (self.l == "ZpMultiplicative" and self.e == 1)
+    return (self.l == "ZpAdditive" and self.e == 0) or (self.l == "ZpMultiplicative" and self.e == 1) or (self.l == "F2^n" and self.e == 1 and self.poly != None and deg(self.poly) == self.N)
 
   def law(self, g1, g2):
     if self.l == "ZpAdditive":
@@ -26,15 +26,15 @@ class Group(object):
       return (g1 * g2) % self.p
     elif self.l == "F2^n":
       p = 0
-      while g2 != 0:
-        if (g2 & 1) > 0:
-          p = p ^ g1
-        g1 = g1 << 1
-        if g1 & (1 << self.N) > 0:
-          for i in range(N+1):
-            if i % 2 == 1:
-              g1 = g1 ^ (1 << )
-        g2 = g2 >> 1
+      x = g1
+      y = g2
+      while y != 0:
+        if (y & 1) > 0:
+          p = p ^ x
+        x = x << 1
+        if (x & (1 << self.N)) > 0:
+          x = x ^ self.poly
+        y = y >> 1
       return p
 
   def exp(self, g, k):
@@ -57,13 +57,13 @@ class Group(object):
       return h0
 
 class SubGroup(Group):
-  def __init__(self, l, e, N, p, g):
-    Group.__init__(self, l, e, N, p)
+  def __init__(self, l, e, N, p, poly, g):
+    Group.__init__(self, l, e, N, p, poly)
     self.g = g
   
   def DLbyTrialMultiplication(self, h):
     tmp = self.e
-    for i in range(self.N):
+    for i in range((1 << self.N) - 1):
       if tmp == h:
         return i
       else:
