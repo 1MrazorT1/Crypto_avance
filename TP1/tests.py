@@ -35,7 +35,13 @@ def testLab1_part2():
   h = F256x.exp(F256x.g, i)
   print("In F2^256, DLbyTrialMultiplication returns the googd result : ", i == F256x.DLbyTrialMultiplication(h))
 
+def testLab1_part5():
+  i = randint(1, 255)
+  F256x = SubGroup("F2^n", 1, 8, 2, 283, 3)
+  h = F256x.exp(F256x.g, i)
+  print("In F2^256, DLbyTrialMultiplication returns the googd result : ", i == F256x.ComputeDL(h))
 
 
 testLab1_part1()
 testLab1_part2()
+testLab1_part5()

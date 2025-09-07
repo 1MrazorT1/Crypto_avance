@@ -79,19 +79,20 @@ class SubGroup(Group):
   def DiffieHellman(self, a, b, A, B, K):
     return A == self.exp(self.g, a) and B == self.exp(self.g, b) and K == self.exp(A, b) and K == self.exp(B, a)
 
-
-
-
-
-
+  def DLbyBabyStepGiantStep(self, h):
+    w = ceil(sqrt(self.N))
+    T = []
+    for i in range(0, w + 1):
+      T.append(self.exp(self.g, i*w))
+    print(T)
+    for j in range(0, w + 1):
+      x = self.law(h, self.exp(self.exp(self.g, -1), j))
+      if x == T[i]:
+        return (w * i + j) % self.N
   
-  #def DLbyTrialMultiplication(self, h):
-  #  w = ceil(sqrt(self.N))
-  #  T = []
-  #  for i in range(0, w + 1):
-  #    T.append(self.exp(self.g, i*w))
-  #  print(T)
-  #  for j in range(0, w + 1):
-  #    x = self.law(h, self.exp(self.exp(self.g, -1), j))
-  #    if x == T[i]:
-  #      return (w * i + j) % N
+  def ComputeDL(self, h, to = 1000):
+    if self.N <= to:
+      return self.DLbyTrialMultiplication(h)
+    else:
+      return self.DLbyBabyStepGiantStep(h)
+    
