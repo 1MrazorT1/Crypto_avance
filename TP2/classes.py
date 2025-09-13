@@ -9,6 +9,8 @@ class Group(object):
       self.N = N
       self.p = p
       self.poly = poly
+      self.A = A
+      self.B = B
       if self.poly != None:
         self.N = deg(self.poly)
       if self.checkParameters() != True:
@@ -68,7 +70,17 @@ class SubGroup(Group):
         Group.__init__(self, l, e, N, p, poly, A, B)
         self.g = g
 
-    #def verify
+    def verify(self, P):
+      if P == self.e:
+        return True
+      x = P[0]
+      y = P[1]
+      p = self.p
+      x = x % p
+      y = y % p
+      A = self.A % p
+      B = self.B % p
+      return (y * y % p) == ((x**3 + A * x + B) % p)
   
     def DLbyTrialMultiplication(self, h):
       tmp = self.e

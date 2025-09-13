@@ -41,7 +41,29 @@ def testLab1_part5():
   h = F256x.exp(F256x.g, i)
   print("In F2^256, DLbyTrialMultiplication returns the googd result : ", i == F256x.ComputeDL(h))
 
+def testLab2_part1():
+  p  = 2**256-2**224+2**192+2**96-1
+  A  = -3
+  B  = int("5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b", 16)
+  N  = int("ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551", 16)
+  Gx = int("6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296", 16)
+  Gy = int("4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5", 16)
+  P256 = SubGroup("ECOPF", [0,0], N, p, None, [Gx, Gy], A=A, B=B)
+  print("P-256 : verify(G) == True ?", P256.verify([Gx, Gy]) == True)
+  print("P-256 : verify(O infinity) == True ?", P256.verify([0,0]) == True)
+  print("P-256 : verify((Gx, p-Gy)) == True ?", P256.verify([Gx, (p - Gy) % p]) == True)
+  print("P-256 : verify((Gx, Gy+1)) == False ?", P256.verify([Gx, (Gy + 1) % p]) == False)
+
+  #Testing the ECDSA public key google's certificates
+  GooglePublicKey = open("google.der", 'rb')
+  PK = GooglePublicKey.read()
+  Pkx = int.from_bytes(PK[0xbf:0xdf], byteorder='big')
+  Pky = int.from_bytes(PK[0xdf:0xff], byteorder='big')
+  GooglePublicKey.close()
+  print(hex(Pkx), hex(Pky))
+  print("Is the point from theECDSA google's public key in the curve P256 ?", P256.verify([Pkx, Pky]) == True)
 
 testLab1_part1()
 testLab1_part2()
 testLab1_part5()
+testLab2_part1()
