@@ -1,6 +1,7 @@
 from math import floor, log2, ceil, sqrt
 from random import randint
 from lab1_utils import deg
+import hashlib
 
 class Group(object):
     def __init__(self, l, e, N, p, poly = None, A = None, B = None):
@@ -142,3 +143,25 @@ class SubGroup(Group):
         return self.DLbyTrialMultiplication(h)
       else:
         return self.DLbyBabyStepGiantStep(h)
+      
+    def ecdsa_sign(self, m, Sk, k = None):
+      tmp = Group("ZpMultiplicative", 1, self.N-1, self.N)
+      e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
+      e = e % self.N
+      if k == None:
+        k = randint(1, self.N - 1)
+      K = self.exp(self.g, k)
+      t = K[0] % self.N
+      s = (tmp.exp(k, -1) * (e + (Sk * t) % self.N)) % self.N
+      return([t, s])
+    
+    def ecdsa_verif(self, m, sig, Q):
+      t = sig[0]
+      s = sig[1]
+      e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
+      e = e % self.N
+      tmp = Group("ZpMultiplicative", 1, self.N-1, self.N)
+      if t not in range(1, self.N) or s not in range(1, self.N):
+        return False
+      R = self.law(self.exp(self.g, (e * tmp.exp(s, -1)) % self.N), self.exp(Q, (t * tmp.exp(s, -1)) % self.N))
+      return R[0] % self.N == t

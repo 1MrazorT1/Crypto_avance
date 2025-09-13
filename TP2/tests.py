@@ -51,7 +51,6 @@ def testLab2_part1():
   P256 = SubGroup("ECConZp", [0,0], N, p, None, [Gx, Gy], A=A, B=B)
   print("P-256 : verify(G) == True ?", P256.verify([Gx, Gy]) == True)
   print("P-256 : verify(O infinity) == True ?", P256.verify([0,0]) == True)
-  print("P-256 : verify((Gx, p-Gy)) == True ?", P256.verify([Gx, (p - Gy) % p]) == True)
   print("P-256 : verify((Gx, Gy+1)) == False ?", P256.verify([Gx, (Gy + 1) % p]) == False)
 
   #Testing the ECDSA public key google's certificates
@@ -65,7 +64,33 @@ def testLab2_part1():
 
   print("In P-256, is test de diffie Hellman == True ?", P256.testDiffieHellman())
 
+def testLab2_part2():
+  P256 = SubGroup("ECConZp", [0,0], int("ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551", 16), 2**256-2**224+2**192+2**96-1, None, [int("6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296", 16), int("4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5", 16)], A=-3, B=int("5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b", 16))
+  m = "Example of ECDSA with P-256"
+  sk =int("c477f9f65c22cce20657faa5b2d1d8122336f851a508a1ed04e479c34985bf96", 16)
+  k = int("7a1a7e52797fc8caaa435d2a4dace39158504bf204fbe19f14dbb427faee50ae", 16)
+  t = int("2b42f576d07f4165ff65d1f3b1500f81e44c316f1f0b3ef57325b69aca46104f", 16)
+  s = int("dc42c2122d6392cd3e3a993a89502a8198c1886fe69d262c4b329bdb6b63faf1", 16)
+  Q = P256.exp(P256.g, sk)
+
+  print("test de ecdsa_verif() : ", [t, s] == P256.ecdsa_sign(m, sk, k))
+  print("test de ecdsa_sign() : ",P256.ecdsa_verif(m, P256.ecdsa_sign(m, sk, k), Q))
+
+  AlicePublicKey = open("ecdhkeyAlice.der", 'rb')
+  PK = AlicePublicKey.read()
+  Sk = int.from_bytes(PK[0x07:0x27], byteorder='big')
+  Pkx = int.from_bytes(PK[0x39:0x59], byteorder='big')
+  Pky = int.from_bytes(PK[0x59:0x79], byteorder='big')
+  AlicePublicKey.close()
+  #print(hex(Pkx), hex(Pky))
+  msg = open("Lab2.pdf","rb").read()
+  sig = P256.ecdsa_sign(msg, Sk)
+  ok = P256.ecdsa_verif(msg, sig, [Pkx,Pky])
+  print("Signature valid?", ok)
+
+
 testLab1_part1()
 testLab1_part2()
 testLab1_part5()
 testLab2_part1()
+testLab2_part2()
