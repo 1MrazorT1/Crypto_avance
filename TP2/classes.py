@@ -19,7 +19,7 @@ class Group(object):
     def checkParameters(self):
       if self.l == "":
         raise Exception("l is unknown.")
-      if self.l == "ECOPF":
+      if self.l == "ECConZp":
         if self.A == None or self.B == None:
           return False
         #Insuring that A and B are in Fp
@@ -45,6 +45,32 @@ class Group(object):
             x = x ^ self.poly
           y = y >> 1
         return p
+      elif self.l == "ECConZp":
+        P = g1
+        Q = g2
+        if P == self.e:
+          return Q
+        if Q == self.e:
+          return P
+        p = self.p
+        Px = P[0] % p
+        Py = P[1] % p
+        Qx = Q[0] % p
+        Qy = Q[1] % p
+        A = self.A % p
+        if Px == Qx and Py != Qy:
+          return self.e
+        if Px == Qx and Py == Qy and Qy == 0:
+          return self.e
+        tmp = Group("ZpMultiplicative", 1, self.p-1, self.p)
+        if Px == Qx and Py == Qy and Qy != 0:
+          lamda = ((3 * Px**2 + A) * tmp.exp((2 * Py) % p, -1)) % p
+          x = (lamda**2 - 2 * Px) % p
+          return([x, (lamda * (Px - x) - Py) % p])
+        if Px != Qx:
+          lamda = ((Qy - Py) % p) * tmp.exp((Qx - Px) % p, -1) % p
+          x = (lamda**2 - Px - Qx) % p
+          return([x, (lamda * (Px - x) - Py) % p])
 
     def exp(self, g, k):
       if k == 0:
