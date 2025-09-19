@@ -93,17 +93,25 @@ def testLab3_part1():
   wikipedia_key = open("wikipedia.der", 'rb')
   c = wikipedia_key.read()
   cert_without_sig = c[0x04:0x04 + 1513]
-  hashed = sha384(cert_without_sig).hexdigest()
+  hashed_d = sha384(cert_without_sig).digest()
+  hashed_h = sha384(cert_without_sig).hexdigest()
   correct_hash = "01c61c9f693846678ce029fa62663baed9cee2618f04df6321bc0bcd2ef867594d99303a374ea9dd36a088742789d40a"
-  print("Is the hashed certificate without signature correct ?", hashed == correct_hash)
-  s = int.from_bytes(c[0x600: 0x600 + 48], byteorder='big')
-  t = int.from_bytes(c[0x631:], byteorder='big')
-  pkx = int.from_bytes(c[], byteorder='big')
-  pky = int.from_bytes(c[], byteorder='big')
+  print("Is the hashed certificate without signature correct ?", hashed_h == correct_hash)
+  t = int.from_bytes(c[0x600 : 0x600 + 48], byteorder='big')
+  s = int.from_bytes(c[0x633 : 0x633 + 49], byteorder='big')
   wikipedia_key.close()
-  P384 = SubGroup("ECConZp", [0,0], int("ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973", 16), int("fffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffee37", 16), None, [int("aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7", 16), int("3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f", 16)], A=-3, B=int("b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef", 16))
+  PK = "04D9F19E4687F8217160A826EBA3FAB9EADA1DB912A7D426D95114B1617C7596BF220B391FD5BED10A46AA2D3C4A09842EBE409555E91940376675ED324E770449F8707BC318E7CEF77110FEAC74D800D4ED6D1C731633109C3AB2EA6C62F4BDB8"
+  pkx = int(PK[2 : 2 + 96], 16)
+  pky = int(PK[2 + 96 : 2 + 96 + 96], 16)
+  p = 39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319
+  n = 39402006196394479212279040100143613805079739270465446667946905279627659399113263569398956308152294913554433653942643
+  A = -3
+  b = 0xb3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef
+  Gx = 0xaa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7 
+  Gy = 0x3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f
+  P384 = SubGroup("ECConZp", [0, 0], n, p, None, [Gx, Gy], A, b)
   sig = [t, s]
-  ok = P384.ecdsa_verif(cert_without_sig, sig, [pkx, pky])
+  ok = P384.ecdsa_verif(hashed_d, sig, [pkx, pky])
   print("Is the signature of the wikipedia certificate valid ?", ok)
 
 

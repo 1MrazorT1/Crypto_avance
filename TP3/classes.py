@@ -158,7 +158,7 @@ class SubGroup(Group):
     def ecdsa_verif(self, m, sig, Q):
       t = sig[0]
       s = sig[1]
-      e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
+      e = int.from_bytes(m)
       e = e % self.N
       tmp = Group("ZpMultiplicative", 1, self.N-1, self.N)
       if t not in range(1, self.N) or s not in range(1, self.N):
