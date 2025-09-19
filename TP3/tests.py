@@ -88,9 +88,20 @@ def testLab2_part2():
   ok = P256.ecdsa_verif(msg, sig, [Pkx,Pky])
   print("Signature valid?", ok)
 
+def testLab3_part1():
+  wikipedia_key = open("wikipedia.der", 'rb')
+  c = wikipedia_key.read()
+  cert_without_sig = int.from_bytes(c[0x03:0x03 + 1513], byteorder='big')
+  wikipedia_key.close()
+  print(cert_without_sig)
+  hashed = hash(cert_without_sig)
+  correct_hash = "01c61c9f693846678ce029fa62663baed9cee2618f04df6321bc0bcd2ef867594d99303a374ea9dd36a088742789d40a"
+  print("Is the hashed certificate without signature correct ?", hashed == correct_hash)
 
-testLab1_part1()
-testLab1_part2()
-testLab1_part5()
-testLab2_part1()
-testLab2_part2()
+
+#testLab1_part1()
+#testLab1_part2()
+#testLab1_part5()
+#testLab2_part1()
+#testLab2_part2()
+testLab3_part1()
