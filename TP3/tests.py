@@ -93,10 +93,18 @@ def testLab3_part1():
   wikipedia_key = open("wikipedia.der", 'rb')
   c = wikipedia_key.read()
   cert_without_sig = c[0x04:0x04 + 1513]
-  wikipedia_key.close()
   hashed = sha384(cert_without_sig).hexdigest()
   correct_hash = "01c61c9f693846678ce029fa62663baed9cee2618f04df6321bc0bcd2ef867594d99303a374ea9dd36a088742789d40a"
   print("Is the hashed certificate without signature correct ?", hashed == correct_hash)
+  s = int.from_bytes(c[0x600: 0x600 + 48], byteorder='big')
+  t = int.from_bytes(c[0x631:], byteorder='big')
+  pkx = int.from_bytes(c[], byteorder='big')
+  pky = int.from_bytes(c[], byteorder='big')
+  wikipedia_key.close()
+  P384 = SubGroup("ECConZp", [0,0], int("ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973", 16), int("fffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffee37", 16), None, [int("aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7", 16), int("3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f", 16)], A=-3, B=int("b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef", 16))
+  sig = [t, s]
+  ok = P384.ecdsa_verif(cert_without_sig, sig, [pkx, pky])
+  print("Is the signature of the wikipedia certificate valid ?", ok)
 
 
 #testLab1_part1()
