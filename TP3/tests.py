@@ -114,7 +114,10 @@ def testLab3_part1():
   ok = P384.ecdsa_verif(hashed_d, sig, [pkx, pky])
   print("Is the signature of the wikipedia certificate valid ?", ok)
 
-
+def testLab3_RSA_key_generation_with_backdoor():
+  k = 128
+  p = 
+  return
 #testLab1_part1()
 #testLab1_part2()
 #testLab1_part5()
