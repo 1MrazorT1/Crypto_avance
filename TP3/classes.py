@@ -13,7 +13,7 @@ class Group(object):
       self.A = A
       self.B = B
       if self.poly != None:
-        self.N = deg(self.poly)
+        self.m = deg(self.poly)
       if self.checkParameters() != True:
         raise Exception("Problem with parameters")
   
@@ -27,7 +27,11 @@ class Group(object):
         A = self.A % self.p
         B = self.B % self.p
         return (4 * A**3 + 27 * B**2 != 0)
-      return (self.l == "ZpAdditive" and self.e == 0) or (self.l == "ZpMultiplicative" and self.e == 1) or (self.l == "F2^n" and self.e == 1 and self.poly != None and deg(self.poly) == self.N)
+      if self.l == "ECC_F2^n":
+        if self.poly == None or self.A == None or self.B == None:
+          return False
+        return self.B != 0
+      return (self.l == "ZpAdditive" and self.e == 0) or (self.l == "ZpMultiplicative" and self.e == 1) or (self.l == "F2^n" and self.e == 1 and self.poly != None and deg(self.poly) > 0)
 
     def law(self, g1, g2):
       if self.l == "ZpAdditive":
@@ -42,7 +46,7 @@ class Group(object):
           if (y & 1) > 0:
             p = p ^ x
           x = x << 1
-          if (x & (1 << self.N)) > 0:
+          if (x & (1 << self.m)) > 0:
             x = x ^ self.poly
           y = y >> 1
         return p
@@ -72,6 +76,34 @@ class Group(object):
           lamda = ((Qy - Py) % p) * tmp.exp((Qx - Px) % p, -1) % p
           x = (lamda**2 - Px - Qx) % p
           return([x, (lamda * (Px - x) - Py) % p])
+      elif self.l == "ECC_F2^n":
+        P = g1
+        Q = g2
+        if P == self.e:
+          return Q
+        elif Q == self.e:
+          return P
+        p = self.p
+        Px = P[0]
+        Py = P[1]
+        Qx = Q[0]
+        Qy = Q[1]
+        A = self.A
+        m = deg(self.poly)
+        tmp = Group("F2^n", 1, (1 << m) - 1, 0, poly=self.poly)
+        if Px == Qx and (Py ^ Qy) == Px:
+          return self.e
+        if Px == Qx and Py == Qy:
+          if Px == 0:
+            return self.e
+          lam = Px ^ tmp.law(Py, tmp.exp(Px, -1))
+          x = tmp.law(lam, lam) ^ lam ^ A 
+          return [x, tmp.law(lam, (Px ^ x)) ^ x ^ Py ]
+        if Px != Qx:
+          lam = tmp.law((Py ^ Qy), tmp.exp((Px ^ Qx), -1))
+          x = tmp.law(lam, lam) ^ lam ^ Px ^ Qx ^ A
+          return [x, tmp.law(lam, (Px ^ x)) ^ x ^ Py]
+
 
     def exp(self, g, k):
       if k == 0:
@@ -102,12 +134,17 @@ class SubGroup(Group):
         return True
       x = P[0]
       y = P[1]
-      p = self.p
-      x = x % p
-      y = y % p
-      A = self.A % p
-      B = self.B % p
-      return (y * y % p) == ((x**3 + A * x + B) % p)
+      if self.l == "ECConZp":
+        p = self.p
+        x = x % p
+        y = y % p
+        A = self.A % p
+        B = self.B % p
+        return (y * y % p) == ((x**3 + A * x + B) % p)
+      if self.l == "ECC_F2^n":
+        m = deg(self.poly)
+        tmp = Group("F2^n", 1, (1<<m) - 1, 0, poly = self.poly)
+        return (tmp.law(y, y) ^ tmp.law(x, y)) == (tmp.law(tmp.law(x, x), x) ^ tmp.law(self.A, tmp.law(x, x)) ^ self.B)
   
     def DLbyTrialMultiplication(self, h):
       tmp = self.e
@@ -158,7 +195,7 @@ class SubGroup(Group):
     def ecdsa_verif(self, m, sig, Q):
       t = sig[0]
       s = sig[1]
-      e = int.from_bytes(m)
+      e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
       e = e % self.N
       tmp = Group("ZpMultiplicative", 1, self.N-1, self.N)
       if t not in range(1, self.N) or s not in range(1, self.N):

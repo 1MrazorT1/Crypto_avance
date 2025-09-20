@@ -97,6 +97,7 @@ def testLab3_part1():
   hashed_h = sha384(cert_without_sig).hexdigest()
   correct_hash = "01c61c9f693846678ce029fa62663baed9cee2618f04df6321bc0bcd2ef867594d99303a374ea9dd36a088742789d40a"
   print("Is the hashed certificate without signature correct ?", hashed_h == correct_hash)
+  
   t = int.from_bytes(c[0x600 : 0x600 + 48], byteorder='big')
   s = int.from_bytes(c[0x633 : 0x633 + 49], byteorder='big')
   wikipedia_key.close()
@@ -114,9 +115,44 @@ def testLab3_part1():
   ok = P384.ecdsa_verif(hashed_d, sig, [pkx, pky])
   print("Is the signature of the wikipedia certificate valid ?", ok)
 
+def testLab3_part2():
+  n = 0x40000000000000000000292fe77e70c12a4234c33
+  poly = 2**163 + 2**7 + 2**6 + 2**3 + 1
+  Gx = 5759917430716753942228907521556834309477856722486
+  Gy = 1216722771297916786238928618659324865903148082417
+  A = 1
+  B = 2982236234343851336267446656627785008148015875581
+  G = [Gx, Gy]
+  B163 = SubGroup("ECC_F2^n", None, n, 0, poly, G, A, B)
+  print("Is the provided G on the curve B163 ?", B163.verify(G))
+  print("Is the testDiffieHellman successful using the curve B163 ?", B163.testDiffieHellman())
+  
+  msg = "Example of ECDSA with B-163"
+  d = 0x348d138c2de9447bd288feed177222ee377fb7bea
+  Qx = 0x66b015c0b72b0f81b1ecba6f58e7545d94744644c
+  Qy = 0xba6d4d62419155b186a29784f4aa4b8e8e1e7f76
+  Q = [Qx, Qy]
+  k = 0x8ed0f93f7d492bb3991847d0e96f9cc3947259aa
+  sig = B163.ecdsa_sign(msg, d, k)
+  print("Are ecdsa_sign() and ecdsa_verif functional and coherent using the curve B163 ?", B163.ecdsa_verif(msg, sig, Q))
+
+  # Verifying the B163 keys
+  b163key = open("b163key.der", 'rb')
+  PK = b163key.read()
+  d = 0x015ee7c3a3d278e32d5243fd52cea520b1b01cea3c
+  Qx = 0x0329a5742bc450f9003356b58be07d1abbb3a7aa48
+  Qy = 0x0663bad7d7e7ac3b91e937c5a4f85180ad281763f5
+  Q  = [Qx, Qy]
+  print("Is the public key correctly generated from the private key ?",Q == B163.exp(B163.g, d))
+  print("Is the public key on curve B163? ", B163.verify(Q))
+  b163key.close()
+
+  
+
 #testLab1_part1()
 #testLab1_part2()
 #testLab1_part5()
 #testLab2_part1()
 #testLab2_part2()
 testLab3_part1()
+testLab3_part2()
