@@ -1,5 +1,6 @@
 from classes import *
 from hashlib import sha384
+from fonctions import *
 
 def testLab1_part1():
   monGroupe = Group("ZpAdditive", 0, 23, 23)
@@ -147,7 +148,34 @@ def testLab3_part2():
   print("Is the public key on curve B163? ", B163.verify(Q))
   b163key.close()
 
-  
+def testLab3_part3():
+  p = 2**255 - 19
+  A = 486662
+  N = 2**252 + 0x14def9dea2f79cd65812631a5cf5d3ed
+  Gx = 9
+  Gy = 0x20ae19a1b8a086b4e01edd2c7748d14c923d4d7e6d7c61b229e9c5a27eced3d9
+  G = [Gx, Gy]
+  e = [0, 1]
+  X25519 = SubGroup("X25519", e, N, p, None, G, A, 1)
+  print("Is G on the X25519 curve ?", X25519.verify(G))
+  print("Is the inverse of G on the X25519 curve ?", X25519.verify([Gx, -Gy]))
+  print("Is the testDiffieHellman true on the curve X25519 ?", X25519.testDiffieHellman())
+
+  #Verifying the Keys of Alice and Bob (second part of Part 3) - I was found at difficulity trying to extract relevant keys with slicing so I had to lean on ChatGPT's help to do so...
+  public_key_Alice = open("public_key_Alice.der","rb").read()[-32:]
+  public_key_Bob = open("public_key_Bob.der","rb").read()[-32:]
+  u_Alice = int.from_bytes(public_key_Alice, "little")
+  u_Bob = int.from_bytes(public_key_Bob, "little")
+  print("Is the public key of Alice on the X25519 curve (Euler criteria) ?", is_on_X25519_Euler_criteria(u_Alice, p, A))
+  print("Is the public key of Alice on the X25519 curve (Euler criteria) ?", is_on_X25519_Euler_criteria(u_Bob, p, A))
+
+  KA = open("key_Alice.der","rb").read()
+  iA = KA.rfind(b"\x04\x20")
+  key_Alice = KA[iA+2:iA+2+32]
+  KB = open("key_Bob.der","rb").read()
+  iB = KB.rfind(b"\x04\x20")
+  key_Bob = KB[iB+2:iB+2+32]
+  print("Does the public key of Alice (resp. Bob) correspond to the multiplication of the private key and G ?", X25519.DiffieHellman(key_Alice, key_Bob, public_key_Alice, public_key_Bob, None))
 
 #testLab1_part1()
 #testLab1_part2()
@@ -156,3 +184,4 @@ def testLab3_part2():
 #testLab2_part2()
 testLab3_part1()
 testLab3_part2()
+testLab3_part3()

@@ -2,6 +2,7 @@ from math import floor, log2, ceil, sqrt
 from random import randint
 from lab1_utils import deg
 import hashlib
+from fonctions import *
 
 class Group(object):
     def __init__(self, l, e, N, p, poly = None, A = None, B = None):
@@ -31,6 +32,10 @@ class Group(object):
         if self.poly == None or self.A == None or self.B == None:
           return False
         return self.B != 0
+      if self.l == "X25519":
+        if self.A == None:
+          return False
+        return (self.A ** 2 - 4) % self.p != 0
       return (self.l == "ZpAdditive" and self.e == 0) or (self.l == "ZpMultiplicative" and self.e == 1) or (self.l == "F2^n" and self.e == 1 and self.poly != None and deg(self.poly) > 0)
 
     def law(self, g1, g2):
@@ -103,6 +108,38 @@ class Group(object):
           lam = tmp.law((Py ^ Qy), tmp.exp((Px ^ Qx), -1))
           x = tmp.law(lam, lam) ^ lam ^ Px ^ Qx ^ A
           return [x, tmp.law(lam, (Px ^ x)) ^ x ^ Py]
+      elif self.l == "X25519":
+        P = g1
+        P2 = g2
+        if P == self.e:
+          return P2
+        elif P2 == self.e:
+          return P
+        
+        p = self.p
+        A = self.A % p
+        B = 1
+
+        x1 = P[0] % p
+        y1 = P[1] % p
+        x2 = P2[0] % p
+        y2 = P2[1] % p
+
+        if x1 == x2 and (y1 + y2) % p == 0:
+          return self.e
+
+        tmp = Group("ZpMultiplicative", 1, p - 1, p)
+
+        if P == P2:
+          if y1 == 0:
+            return self.e
+          lam = ((3*(x1**2 % p) + 2 * self.A * x1 + 1) % p) * tmp.exp((2 * B * y1) % p, -1)
+        elif x1 != x2:
+          lam = ((y2 - y1) % p) * tmp.exp((x2 - x1) % p, -1)
+        lam = lam % p
+        x3 = (B * lam**2 - x1 - x2 - self.A) % p
+        y3 = (lam * (x1 - x3) - y1) % p
+        return [x3, y3]
 
 
     def exp(self, g, k):
@@ -145,7 +182,13 @@ class SubGroup(Group):
         m = deg(self.poly)
         tmp = Group("F2^n", 1, (1<<m) - 1, 0, poly = self.poly)
         return (tmp.law(y, y) ^ tmp.law(x, y)) == (tmp.law(tmp.law(x, x), x) ^ tmp.law(self.A, tmp.law(x, x)) ^ self.B)
-  
+      if self.l == "X25519":
+        p = self.p
+        A = self.A % p
+        x = x % p
+        y = y % p
+        return ((y * y) % p) == (((((x * x) % p) * x) + (A * ((x * x) % p)) + x ) % p)
+      
     def DLbyTrialMultiplication(self, h):
       tmp = self.e
       for i in range((1 << self.N) - 1):
@@ -161,8 +204,20 @@ class SubGroup(Group):
       B = self.exp(self.g, b)
       return self.exp(A, b) == self.exp(B, a)
   
-    def DiffieHellman(self, a, b, A, B, K):
-      return A == self.exp(self.g, a) and B == self.exp(self.g, b) and K == self.exp(A, b) and K == self.exp(B, a)
+    def DiffieHellman(self, a, b, A = None, B = None, K = None):
+      if self.l != "X25519":
+        return A == self.exp(self.g, a) and B == self.exp(self.g, b) and K == self.exp(A, b) and K == self.exp(B, a)
+      else:
+        sa = (reverse_bytes_25519(int.from_bytes(a, "big")) & ((1 << 255) - 8)) | (1 << 254)
+        sb = (reverse_bytes_25519(int.from_bytes(b, "big")) & ((1 << 255) - 8)) | (1 << 254)
+        A_calc = self.exp(self.g, sa)
+        B_calc = self.exp(self.g, sb)
+        A_bytes = reverse_bytes_25519(A_calc[0]).to_bytes(32, "big")
+        B_bytes = reverse_bytes_25519(B_calc[0]).to_bytes(32, "big")
+        is_pub_A_good = A == A_bytes
+        is_pub_B_good = B == B_bytes
+        shared_key = reverse_bytes_25519(self.exp(B_calc, sa)[0]) == reverse_bytes_25519(self.exp(A_calc, sb)[0])
+        return shared_key and is_pub_A_good and is_pub_B_good
 
     def DLbyBabyStepGiantStep(self, h):
       w = ceil(sqrt(self.N))
@@ -195,7 +250,10 @@ class SubGroup(Group):
     def ecdsa_verif(self, m, sig, Q):
       t = sig[0]
       s = sig[1]
-      e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
+      if isinstance(m, bytes): #I looked this up to check if m is already hashed or not
+        e = int.from_bytes(m, "big")
+      else:
+        e = int.from_bytes(hashlib.sha256(str(m).encode()).digest(), "big")
       e = e % self.N
       tmp = Group("ZpMultiplicative", 1, self.N-1, self.N)
       if t not in range(1, self.N) or s not in range(1, self.N):
