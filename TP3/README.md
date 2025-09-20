@@ -53,49 +53,41 @@ It extends the work of Lab 2 by introducing more advanced elliptic curve setting
 
 ## Files descriptions
 
-### classes.py
+- classes.py:
 Implements the core `Group` and `SubGroup` classes:
 
-- `checkParameters()` – validates parameters for Zp, F2^n, ECConZp, ECC_F2^n, X25519.  
-- `law(P, Q)` – group law (addition of points, Montgomery ladder for X25519).  
-- `verify(P)` – tests whether a point lies on the curve.  
-- `exp(P, k)` – scalar multiplication.  
-- `ecdsa_sign(m, sk, k)` – signs message `m` with private key `sk`.  
-- `ecdsa_verif(m, sig, Q)` – verifies signature with public key `Q`.  
-- `DiffieHellman(...)` – computes/validates shared key.
+   - `checkParameters()` – validates parameters for Zp, F2^n, ECConZp, ECC_F2^n, X25519.  
+   - `law(P, Q)` – group law (addition of points, Montgomery ladder for X25519).  
+   - `verify(P)` – tests whether a point lies on the curve.  
+   - `exp(P, k)` – scalar multiplication.  
+   - `ecdsa_sign(m, sk, k)` – signs message `m` with private key `sk`.  
+   - `ecdsa_verif(m, sig, Q)` – verifies signature with public key `Q`.  
+   - `DiffieHellman(...)` – computes/validates shared key.
 
----
 
-### fonctions.py
+- fonctions.py:
 Utility functions:
 
-- `reverse_bytes_25519()` – handles reverseness for Curve25519 keys.  
-- `is_on_X25519_Euler_criteria(u, p, A)` – Implements the Euler criterion.
+   - `reverse_bytes_25519()` – handles reverseness for Curve25519 keys.  
+   - `is_on_X25519_Euler_criteria(u, p, A)` – Implements the Euler criterion.
 
----
 
-### lab1_utils.py
+- lab1_utils.py:
 Provides polynomial degree computation for binary fields.
 
----
 
-### tests.py
+- tests.py:
 Implements the different lab exercises:
 
-- `testLab3_part1` – Wikipedia certificate parsing, SHA-384 hashing, signature verification with P-384.  
-- `testLab3_part2` – Curve B-163: verify base point, test DH, run ECDSA with NIST vectors, check key generation via OpenSSL.  
-- `testLab3_part3` – X25519: verify curve, test generator inverse, run Diffie–Hellman, parse Alice/Bob keys from DER, confirm Euler criterion and correctness of \( Q = d \cdot G \), check shared secrets.
+   - `testLab3_part1` – Wikipedia certificate parsing, SHA-384 hashing, signature verification with P-384.  
+   - `testLab3_part2` – Curve B-163: verify base point, test DH, run ECDSA with NIST vectors, check key generation via OpenSSL.  
+   - `testLab3_part3` – X25519: verify curve, test generator inverse, run Diffie–Hellman, parse Alice/Bob keys from DER, confirm Euler criterion and correctness of \( Q = d \cdot G \), check shared secrets.
 
----
-
-### wikipedia.der
+- wikipedia.der:
 Certificate of *wikipedia.org* in DER format (converted with OpenSSL).
 
-### b163key.der
+- b163key.der:
 ECDSA keypair generated for curve B-163 (DER format).
 
-### key_Alice.der / key_Bob.der / public_key_Alice.der / public_key_Bob.der
+- key_Alice.der / key_Bob.der / public_key_Alice.der / public_key_Bob.der:
 Alice’s and Bob’s X25519 private/public keys generated with OpenSSL.
-
-### Lab3.pdf
-Lab instructions / reference document.
