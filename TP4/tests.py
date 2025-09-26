@@ -1,20 +1,21 @@
-block_sample = "010000008095126f08f377b143410cc3c5da3f3d25732d014dc9da1855e8e713000000005a1b723ae6c479056af838a6ea40db6f4acee39f262bf49864cd98f511221d5c7f1ff84b249c151c23af360b0201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704249c151c0176ffffffff01c090ec2f01000000434104e1ab3a971f202c86fdd25d8d9f3b486b80bb30ad36d93c030f409918df7f670f6b148400fff9676c70810391b38875ef613987234252cba32d36eae99e05e5a5ac0000000001000000830d2e8f94c33a10f3834554cc1f1469e069f0fcf31a47309d42a9d00f4ba57d86000000008c493046022100bc57dc26f46fecc1da03272cb2298d8a08b22d865541f5b3a3e862cc87da4b47022100ce1fc72771d164d608b15065832542a0e9040cfdf28862c5175c81fcb0e0b65501410434417dd8d89deaf0f6481c2c160d6de0921624ef7b956f38eef9ed4a64e36877be84b77cdee5a8d92b7d93694f89c3011bf1cbdf4fd7d8ca13b58a7bb4ab0804ffffffff1bdfd08a1713d1add2c8624975dbb795de0c7038bca7242d032d0e0b6e92b2a1000000008c49304602210097f8cd3973e5d4c7a2556c82539a710345f82f089398649684a12b3026ae9de5022100d3e46fa2e95988e132f609d267fb403c679a60c3d9d3f936e54f8b4f76d4e4a301410434417dd8d89deaf0f6481c2c160d6de0921"
-block_sample = block_sample[:160]
+def test_block_header_extraction():
+    block_sample = "010000008095126f08f377b143410cc3c5da3f3d25732d014dc9da1855e8e713000000005a1b723ae6c479056af838a6ea40db6f4acee39f262bf49864cd98f511221d5c7f1ff84b249c151c23af360b0201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704249c151c0176ffffffff01c090ec2f01000000434104e1ab3a971f202c86fdd25d8d9f3b486b80bb30ad36d93c030f409918df7f670f6b148400fff9676c70810391b38875ef613987234252cba32d36eae99e05e5a5ac0000000001000000830d2e8f94c33a10f3834554cc1f1469e069f0fcf31a47309d42a9d00f4ba57d86000000008c493046022100bc57dc26f46fecc1da03272cb2298d8a08b22d865541f5b3a3e862cc87da4b47022100ce1fc72771d164d608b15065832542a0e9040cfdf28862c5175c81fcb0e0b65501410434417dd8d89deaf0f6481c2c160d6de0921624ef7b956f38eef9ed4a64e36877be84b77cdee5a8d92b7d93694f89c3011bf1cbdf4fd7d8ca13b58a7bb4ab0804ffffffff1bdfd08a1713d1add2c8624975dbb795de0c7038bca7242d032d0e0b6e92b2a1000000008c49304602210097f8cd3973e5d4c7a2556c82539a710345f82f089398649684a12b3026ae9de5022100d3e46fa2e95988e132f609d267fb403c679a60c3d9d3f936e54f8b4f76d4e4a301410434417dd8d89deaf0f6481c2c160d6de0921"
+    block_sample = block_sample[:160]
 
-block_version = 0x01
-block_id_previous_hash = 0x0000000013e7e85518dac94d012d73253d3fdac5c30c4143b177f3086f129580
-Merkle_root = 0x5c1d2211f598cd6498f42b269fe3ce4a6fdb40eaa638f86a0579c4e63a721b5a
-block_timestamp = 0x4bf81f7f
-field_bits = 0x1c159c24
-nonce = 0xb36af23
+    block_version = 0x01
+    block_id_previous_hash = 0x0000000013e7e85518dac94d012d73253d3fdac5c30c4143b177f3086f129580
+    Merkle_root = 0x5c1d2211f598cd6498f42b269fe3ce4a6fdb40eaa638f86a0579c4e63a721b5a
+    block_timestamp = 0x4bf81f7f
+    field_bits = 0x1c159c24
+    nonce = 0xb36af23
 
-block_version = block_version.to_bytes(4, byteorder='little')
-block_id_previous_hash = block_id_previous_hash.to_bytes(32, byteorder='little')
-Merkle_root = Merkle_root.to_bytes(32, byteorder='little')
-block_timestamp = block_timestamp.to_bytes(4, byteorder='little')
-field_bits = field_bits.to_bytes(4, byteorder='little')
-nonce = nonce.to_bytes(4, byteorder='little')
+    block_version = block_version.to_bytes(4, byteorder='little')
+    block_id_previous_hash = block_id_previous_hash.to_bytes(32, byteorder='little')
+    Merkle_root = Merkle_root.to_bytes(32, byteorder='little')
+    block_timestamp = block_timestamp.to_bytes(4, byteorder='little')
+    field_bits = field_bits.to_bytes(4, byteorder='little')
+    nonce = nonce.to_bytes(4, byteorder='little')
 
-block_header = block_version + block_id_previous_hash + Merkle_root + block_timestamp + field_bits + nonce
-block_header = block_header.hex()
-print("Is the data extracted are exactly the 160 first characters of the true block ? ", block_header == block_sample)
+    block_header = block_version + block_id_previous_hash + Merkle_root + block_timestamp + field_bits + nonce
+    block_header = block_header.hex()
+    print("Is the data extracted are exactly the 160 first characters of the true block ? ", block_header == block_sample)
