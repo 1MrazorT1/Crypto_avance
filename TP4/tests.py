@@ -204,9 +204,12 @@ def verifying_raw_data():
     data = load(f)
   id_block = list(data["data"].keys())[0]
   block_header = bytes.fromhex(data["data"][id_block]["raw_block"][:160])
+  count_hex = data["data"][id_block]["raw_block"][160:162]
   raw_block = bytes.fromhex(data["data"][id_block]["raw_block"])
-  mining_transaction = "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704249c151c0176ffffffff01c090ec2f01000000434104e1ab3a971f202c86fdd25d8d9f3b486b80bb30ad36d93c030f409918df7f670f6b148400fff9676c70810391b38875ef613987234252cba32d36eae99e05e5a5ac00000000"
-  pizza_transaction = ""
+  mining_transaction = "bd9075d78e65a98fb054cb33cf0ecf14e3e7f8b3150231df8680919a79ac8fe5"
+  pizza_transaction = "a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d"
+  concat_hex = block_header + count_hex + mining_transaction_hex + pizza_transaction_hex
+  return raw_block == bytes.fromhex(concat_hex)
 
 #testLab1_part1()
 #testLab1_part2()

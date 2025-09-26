@@ -1,5 +1,6 @@
 from json import load
 from hashlib import sha256
+from classes import *
 
 def is_on_X25519_Euler_criteria(u, p, A):
     x = ((u**3 % p) + A * (u**2 % p) + u) % p
@@ -11,7 +12,7 @@ def reverse_bytes_25519(b):
 def reverseBytes(data):
     data = bytearray(data)
     data.reverse()
-    return data
+    return bytes(data)
 
 def recoverData(Filename):
     with open(Filename, "r") as f:
@@ -37,16 +38,30 @@ def checkHeader():
     print("Does the Merkle root correspond to the hash SHA256d of the two identifiers ?", CheckMerkleTree_57043(l[2], id1, id2))
 
 def recoverDataFromHeader(header):
-    blockVersion = header[:4]
-    idPreviousBlock = header[4: 4 + 32]
-    MerkleRoot = header[4 + 32 : 4 + 32 + 32]
-    timestamp = header[4 + 32 + 32 : 4 + 32 + 32 + 4]
-    bits = header[4 + 32 + 32 + 4 : 4 + 32 + 32 + 4 + 4]
-    nonce = header[4 + 32 + 32 + 4 + 4 : 4 + 32 + 32 + 4 + 4 + 4]
+    blockVersion = "0x" + reverseBytes(header[:4]).hex()
+    idPreviousBlock = "0x" + reverseBytes(header[4: 4 + 32]).hex()
+    MerkleRoot = "0x" + reverseBytes(header[4 + 32 : 4 + 32 + 32]).hex()
+    timestamp = "0x" + reverseBytes(header[4 + 32 + 32 : 4 + 32 + 32 + 4]).hex()
+    bits = "0x" + reverseBytes(header[4 + 32 + 32 + 4 : 4 + 32 + 32 + 4 + 4]).hex()
+    nonce = "0x" + reverseBytes(header[4 + 32 + 32 + 4 + 4 : 4 + 32 + 32 + 4 + 4 + 4]).hex()
     return [blockVersion, idPreviousBlock, MerkleRoot, timestamp, bits, nonce]
 
 def checkIdBlock(id, h):
-    return sha256(sha256(h).digest()).hexdigest() == reverseBytes(id.encode())
+    return reverseBytes(sha256(sha256(h).digest()).digest()).hex() == id
 
 def CheckMerkleTree_57043(Merkle_root, id1, id2):
-    return sha256(sha256(id1 + id2).digest()).hexdigest() == reverseBytes(Merkle_root)
+    return reverseBytes(sha256(sha256(reverseBytes(id1) + reverseBytes(id2)).digest()).digest()) == reverseBytes(Merkle_root)
+
+def checkTransactions():
+    l = []
+    with open("block_57043.json", "r") as f:
+        data = load(f)
+    id_block = list(data["data"].keys())[0]
+    transactions = data["data"][id_block]["tx"]
+    p = 2**256 - 2**32 - 2**8 - 2**7 - 2**6 - 2**4 - 1
+    A = 0
+    B = 0
+    Px = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
+    Py = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
+    N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd036414
+    E = SubGroup("ECConZp", [0, 0], N, p, A, B, g = (Px, Py))
