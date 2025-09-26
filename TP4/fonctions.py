@@ -4,3 +4,8 @@ def is_on_X25519_Euler_criteria(u, p, A):
 
 def reverse_bytes_25519(b):
     return sum(((b >> 8 * (31- i)) & 0xff) << (8*i) for i in range(32))
+
+def reverseBytes(data):
+    data = bytearray(data)
+    data.reverse()
+    return data
