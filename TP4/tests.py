@@ -19,3 +19,5 @@ def test_block_header_extraction():
     block_header = block_version + block_id_previous_hash + Merkle_root + block_timestamp + field_bits + nonce
     block_header = block_header.hex()
     print("Is the data extracted are exactly the 160 first characters of the true block ? ", block_header == block_sample)
+
+test_block_header_extraction()
