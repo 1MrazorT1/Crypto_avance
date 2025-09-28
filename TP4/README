@@ -1,0 +1,59 @@
+# TP4 — Bitcoin Cryptography
+
+## Overview
+
+This TP explores how Bitcoin’s blockchain encodes data and how its core cryptographic checks work. I parsed a real block, recomputed identifiers, verified a Merkle root, and validated an ECDSA signature on secp256k1 for a simple one-input transaction in the next block. The tasks are:
+
+- Block 57043 header parsing & validation
+
+- Transaction layout & Merkle root (block 57043)
+
+- ECDSA verification on secp256k1 (block 57044)
+
+- Base58Check address (Jeremy Sturdivant)
+
+All steps and constants are specified in the TP4 PDF “The Bitcoin crypto-currency.”
+
+## Repo
+
+### File structure
+
+```
+├── README
+├── block_57043.json
+├── block_57044.json
+├── classes.py
+├── fonctions.py
+├── lab1_utils.py
+└── tests.py
+```
+
+### Files content
+
+- classes.py: Core algebra and ECC primitives:
+
+    - Group / SubGroup
+
+    - Scalar multiplication exp, ECDSA ecdsa_sign / ecdsa_verif, and helpers used in TP4’s secp256k1 checks.
+
+- fonctions.py: Bitcoin-specific utilities for this TP:
+
+    - Endianness helper reverseBytes.
+
+    - recoverData() to fetch id + header + transactions, now also supporting live fetch from Blockchair via requests.
+
+    - checkHeader() to parse/print header fields and validate the block id.
+
+    - checkIdTransaction() to recompute txid = SHA256d(raw_tx).
+
+    - CheckMerkleTree_57043() to rebuild the Merkle root from the two txids.
+
+    - checkTransactions() to parse the 300-byte tx in block 57044, rebuild the SIGHASH_ALL preimage, and verify the secp256k1 ECDSA signature.
+
+    - build_jer_basecheck_address() to derive the Base58Check address from 04||Qx||Qy.
+
+- lab1_utils.py
+
+- block_57043.json / block_57044.json: The two blocks used in the TP, code can also query them online with the python library requests.
+
+- tests.py: contains the TP steps: header extraction test, checkHeader(), block concatenation check, and execute TP4 verifications.
