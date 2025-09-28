@@ -199,18 +199,6 @@ def test_block_header_extraction():
     block_header = block_header.hex()
     print("Is the data extracted are exactly the 160 first characters of the true block ? ", block_header == block_sample)
 
-def verifying_raw_data():
-  with open("block_57043.json", "r") as f:
-    data = load(f)
-  id_block = list(data["data"].keys())[0]
-  block_header = bytes.fromhex(data["data"][id_block]["raw_block"][:160])
-  count_hex = data["data"][id_block]["raw_block"][160:162]
-  raw_block = bytes.fromhex(data["data"][id_block]["raw_block"])
-  mining_transaction = "bd9075d78e65a98fb054cb33cf0ecf14e3e7f8b3150231df8680919a79ac8fe5"
-  pizza_transaction = "a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d"
-  concat_hex = block_header + count_hex + mining_transaction_hex + pizza_transaction_hex
-  return raw_block == bytes.fromhex(concat_hex)
-
 #testLab1_part1()
 #testLab1_part2()
 #testLab1_part5()
@@ -221,4 +209,4 @@ def verifying_raw_data():
 #testLab3_part3()
 test_block_header_extraction()
 checkHeader()
-verifying_raw_data()
+build_jer_basecheck_address()
