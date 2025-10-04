@@ -9,7 +9,7 @@ print("Does len(traces[0]) return 9996 ?", len(traces[0]) == 9996)
 from data_Lab5.sbox_aes import sbox
 sbox = np.array(sbox)
 
-Hamming_weights = np.array([bin(i).count("1") for i in range(256)])
+Hamming_weight = np.array([bin(i).count("1") for i in range(256)])
 N, Npoints = traces.shape
 trace_means = traces.mean(axis=0)
 recovered_key_bytes = []
@@ -19,7 +19,7 @@ for index_of_byte in range(16):
     for k in range(256):
         xored = Pj ^ k
         s = sbox[xored]
-        Wi_k  = Hamming_weights[s]
+        Wi_k  = Hamming_weight[s]
         Wk_mean = Wi_k.mean()
         sum1 = np.zeros(Npoints)
         sum2 = np.zeros(Npoints)
