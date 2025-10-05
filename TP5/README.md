@@ -3,15 +3,13 @@
 ## Overview
 
 This TP introduces power analysis techniques used to extract cryptographic secrets from physical implementations.
-I only implemented the CPA attack. The SPA attack is incomplete due to it being a bit tricky.
+I implemented both the SPA and CPA attacks.
 
 The objectives were:
 
 Part 1 — SPA: recover a private scalar from double-and-add traces (CryptoHack “Double and Broken” challenge).
 
 Part 2 — CPA: recover a key from 50 power traces using the Hamming-weight leakage model.
-
-All datasets and methods are described in the TP5 PDF “Timing and Power Analysis.”
 
 ## File Structure
 
@@ -25,7 +23,7 @@ All datasets and methods are described in the TP5 PDF “Timing and Power Analys
 │   │   └── traces.npy
 │   └── trace0.png
 ├── README.md
-└── spa_attack
+└── SPA_attack
     ├── collected_data.txt
     ├── source_snippet.py
     └── spa_attack.py
@@ -33,9 +31,9 @@ All datasets and methods are described in the TP5 PDF “Timing and Power Analys
 
 ## Files content
 
-- CPA_attack/cpa_attack.py: Implementation of the Correlation Power Analysis attack:
+- CPA_attack/cpa_attack.py: Implementation of the CPA attack:
 
-Loads 50 × 9996 traces and plaintexts.
+Loads traces and plaintexts.
 
 Uses the Hamming-weight model on the S-box output for each byte (1 to 16).
 
@@ -51,8 +49,8 @@ Compares the recovered key to the actual solution.
 
     - sbox_aes.py: S-box definition.
 
-- spa_attack/source_snippet.py: Provided CryptoHack snippet for Double and Broken on secp256k1.
+- SPA_attack/source_snippet.py: Provided CryptoHack snippet for Double and Broken on secp256k1.
 
-- spa_attack/collected_data.txt: 50 recorded power traces from repeated scalar multiplications.
+- SPA_attack/collected_data.txt: 50 recorded traces.
 
-- spa_attack/spa_attack.py: My in-progress Simple Power Analysis attempt.
+- SPA_attack/spa_attack.py: Implementation of the SPA attack: reconstructs the private key from the 50 repeated multiplications.
